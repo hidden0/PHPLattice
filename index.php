@@ -9,9 +9,12 @@
 <h2>The Framework Testing</h2>
 <hr />
 <?php
-include "PHPLattice/main.php";
-$tphp = new ThornePHP();
-print_r($tphp->classes);
+//Testing implementations
+require_once("phpLattice.php");
+$tphp = new PHPLattice();
+//Testing the database class
+$database = $tphp->loadResource($tphp->classes['database.class.php']);
+$database->open();
 ?>
 </body>
 </html>

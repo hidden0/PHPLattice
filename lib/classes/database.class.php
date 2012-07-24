@@ -58,30 +58,21 @@ class dbconn {
 	private $database;
 	private $connection;
 	
-	//Default constructor calls db.php as an INI file
-	//TODO: Consider a safer method of handling the password? Is this the safest method?
-	function dbconn($host, $user, $pass, $database) {
-		//Parse in the ini file
-		$db_info=parse_ini_file("db.php", true);
-		//Load details
-		$this->host=$db_info['database_details']['host'];
-		$this->username=$db_info['database_details']['username'];
-		$this->password=$db_info['database_details']['password'];
-		$this->database=$db_info['database_details']['database'];
+	function dbconn() {
+		$this->host="test";
 	}
-	
 	//Open a connection
 	function open() {
 		//Start a connection to the database
-		$con=mysql_connect($this->getHost(),$this->getUsername(),$this->getPassword()) or die(mysql_error());
-		mysql_select_db($this->getDatabase(), $con) or die(mysql_error());
+		$con=@mysql_connect($this->getHost(),$this->getUsername(),$this->getPassword()) or $this->showErr("***Error*** ".mysql_error());
+		@mysql_select_db($this->getDatabase(), $con) or $this->showErr("***Error*** ".mysql_error());
 		$this->setConnection($con);
 	}
 	
 	//Close a connection
 	function close($connection) {
 		//Close an open database connection
-		mysql_close($connection) or die(mysql_error());
+		@mysql_close($connection) or $this->showErr("***Error*** ".mysql_error());
 		$this->setConnection($connection);
 	}
 	
@@ -155,36 +146,37 @@ class dbconn {
 		$this->connection=$val;
 	}
 	function showErr($e) {
+		//Check if the *** delimter is set, indicating that I am passing a mysql_error code
 		?>
-        <div id="exception">
-        	<h2>An Error has occured</h2>
-            <hr />
-            <p>Debugging</p>
-            <p>Known Bugs:</p>
-            <ol>
-            	<li>Pressing ENTER or RETURN on the search box.  Please click on your selection.  I know, stupid bug.  I'll fix it.</li>
-                <li>List will grow as I find more bugs.</li>
-            </ol>
-            <?php
-			$html_out = "<ul>";
-			$html_out = $html_out."<li>Error Message: ".$e->getMessage()."</li>";
-            $html_out = $html_out."<li>Error Code: ".$e->getCode()."</li>";
-            $html_out = $html_out."<li>Error File: ".$e->getFile()."</li>";
-            $html_out = $html_out."<li>Error Line:".$e->getLine()."</li>";
-            $html_out = $html_out."<li>Error Stack Trace: <br />";
-			$html_out = $html_out."<ul>";
-				foreach($e->getTrace() AS $line) {
-						print_r($line);
-						//$html_out = $html_out."<li>File: ".$line['file']."<br />Function: ".$line['function']."<br />Argument: ".$line['args'][0]."</li>";
-				}
-				//echo print_r($e->getTrace()); 
-				$html_out = $html_out."</ul>";
-				$html_out = $html_out."</li>";
-	            $html_out = $html_out."</ul>";
-				echo $html_out;
+		<div id="exception">
+			<h2>An Error has occured</h2>
+			<hr />
+			<p>Debugging</p>
+			<?php
+			if(substr($e,0,3)=="***") {
+				$html_out = "MySQL has encountered an error. Here it is: ".$e;
+			}
+			else {
+				$html_out = "<ul>";
+				$html_out = $html_out."<li>Error Message: ".$e->getMessage()."</li>";
+				$html_out = $html_out."<li>Error Code: ".$e->getCode()."</li>";
+				$html_out = $html_out."<li>Error File: ".$e->getFile()."</li>";
+				$html_out = $html_out."<li>Error Line:".$e->getLine()."</li>";
+				$html_out = $html_out."<li>Error Stack Trace: <br />";
+				$html_out = $html_out."<ul>";
+					foreach($e->getTrace() AS $line) {
+							print_r($line);
+							//$html_out = $html_out."<li>File: ".$line['file']."<br />Function: ".$line['function']."<br />Argument: ".$line['args'][0]."</li>";
+					}
+					//echo print_r($e->getTrace()); 
+					$html_out = $html_out."</ul>";
+					$html_out = $html_out."</li>";
+					$html_out = $html_out."</ul>";
+			}
+			echo $html_out;
 				?>
-        </div>
-        <?php
+		</div>
+		<?php
 	}
 }
 ?>
