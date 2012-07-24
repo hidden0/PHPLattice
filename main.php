@@ -1,9 +1,17 @@
 <?php
-/***
-Thorne PHP Framework
-Main entry point for class loading
-Optimized to know available code without loading it into memory
-***/
+/*
+PHPLattice Framework main.php
+Description:
+Creates the entry point and manipulation of the framework itself.
+Resources such as function libraries or class files are not loaded
+initially (this would load a lot of crap eventually), but are instead
+specified by the user. 
+
+How it works: First the constructor enumerates the files in the library
+folder.  First creating a list of class files, then a list of function library
+files, and stores them for later reference.  At the point the user needs
+a specific resource, they can load it with this list.
+*/
 class ThornePHP {
 	
 	//Fields
@@ -20,7 +28,7 @@ class ThornePHP {
 	function ThornePHP() {
 		$this->debug=true;
 		//Load our 'available' class names into the classes variable
-		if($handle = opendir(getcwd()."/thornephp/lib/classes")) {
+		if($handle = opendir(getcwd()."/PHPLattice/lib/classes")) { 
 			$x=0;
 			while (false !== ($entry = readdir($handle))) {
 				//exclude current and parent directory symbols

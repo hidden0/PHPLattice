@@ -1,6 +1,6 @@
 ThornePHP Framework Version TBD
 ===============================================================
-						DESCRIPTION
+				DESCRIPTION
 ===============================================================
 This framework provides quick and easy access to
 functions custom tailored for Johnathan Thorne's work environment.
@@ -10,14 +10,14 @@ functions are done poorly, insecurely, or in-efficiently.
 In an attempt to make my PHP scripts run more smoothly, I have created
 this framework.  I aim on implementing several classes for less future coding.
 ===============================================================
-					   INSTALLATION
+				INSTALLATION
 ===============================================================
 1) Download the latest version of ThornePHP Framework at
 ***git hup repo link here*** (zip file)
 2) Extract the zip file to your www, public_html, or specified "web" directory.
 3) In your PHP code, include the main.php file at the top of your document
 ===============================================================
-						   USAGE
+				USAGE
 ===============================================================
 Using the ThornePHP Framework is easy!  You can start right away
 by adding the main.php file to your php documents to access all of
@@ -38,7 +38,7 @@ Consult the documentation or API reference for more information on how
 to use this data more effectively.  A quick example of using the database class
 and other classes can be seen below.
 ===============================================================
-					     EXAMPLES
+				EXAMPLES
 ===============================================================
 Using the framework:
 
