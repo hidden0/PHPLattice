@@ -1,4 +1,4 @@
-ThornePHP Framework Version TBD
+PHPLattice Framework Version TBD
 ===============================================================
 				DESCRIPTION
 ===============================================================
@@ -12,26 +12,26 @@ this framework.  I aim on implementing several classes for less future coding.
 ===============================================================
 				INSTALLATION
 ===============================================================
-1) Download the latest version of ThornePHP Framework at
-***git hup repo link here*** (zip file)
+1) Download the latest version of PHPLattice Framework at
+https://github.com/hidden0/PHPLattice (zip file)
 2) Extract the zip file to your www, public_html, or specified "web" directory.
-3) In your PHP code, include the main.php file at the top of your document
+3) In your PHP code, include the phpLattice.php file at the top of your document
 ===============================================================
 				USAGE
 ===============================================================
-Using the ThornePHP Framework is easy!  You can start right away
-by adding the main.php file to your php documents to access all of
+Using the PHPLattice Framework is easy!  You can start right away
+by adding the phpLattice.php file to your php documents to access all of
 the code.
 
 Example:
-	//include the ThornePHP framework
-	include("path/to/framework/main.php");
-	$tphp = new ThornePHP();
+	//include the PHPLattice framework
+	include("path/to/framework/phpLattice.php");
+	$phpl = new PHPLattice();
 	
 	//do stuff...
-	$db = $tphp->loadClass("database"); //loads database class
-	$db->setCon("localhost", "user", "pass", "database"); //connects to data source
-	$result = $db->doSQL("SELECT * FROM table"); //does SQL query
+	$db = $phpl->loadResource("database"); //loads database class
+	$db->setup("localhost", "user", "pass", "database"); //connects to data source
+	$result = $db->sqlQuery("SELECT * FROM table"); //does SQL query
 	
 Now you have access to all classes and functions in the framework.
 Consult the documentation or API reference for more information on how
@@ -42,23 +42,23 @@ and other classes can be seen below.
 ===============================================================
 Using the framework:
 
-	//include the ThornePHP framework
-	include("path/to/framework/main.php");
-	$tphp = new ThornePHP();
+	//include the PHPLattice framework
+	include("path/to/framework/phpLattice.php");
+	$phpl = new PHPLattice();
 	
 The rest of the examples assume you have included the framework.
 
 Using the database class:
 	
 	//setup a new database object
-	$db = $tphp->loadClass("database"); //loads database class
-	$db->setCon("localhost", "user", "pass", "database"); //connects to data source
-	$result = $db->doSQL("SELECT * FROM table"); //does SQL query
+	$db = $phpl->loadResource("database"); //loads database.class.php file
+	$db->setup("localhost", "user", "pass", "database"); //connects to data source
+	$result = $db->sqlQuery("SHOW TABLES"); //does SQL query
 
 Using the mailer class:
 
 	//setup a new email object
-	$email = $tphp->loadClass("email"); //loads email class
-	$output = $email->send("thornethegreat@gmail.com", "Subject", "From", "Headers");
+	$email = $phpl->loadResource("email"); //loads email.class.php file
+	$email->send("thornethegreat@gmail.com", "Subject", "From", "Headers");
 	
 More to be added

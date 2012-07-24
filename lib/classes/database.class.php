@@ -12,13 +12,13 @@ Fields:
 	$password - Password for the user, must have access
 	$database - Specified database to manipulate with this object
 	$connection - Database resource link identifier
+	$debug - Boolean that controls output of errors - True to show errors
 
 Methods:
-	
-	dbconn($host, $user, $pass, $database)
-	Type - Constructor
-	Description - Used to instantiate the connectio process 
-	and maintain a link to the server specified.
+	setup()
+	Type - Constructor (not really)
+	Description - Sets up initial connection details to be used
+	throughout lifetime of object.
 	
 	open()
 	Type - Helper Method
@@ -41,26 +41,28 @@ Methods:
 	human readable format.
 	
 TODO List:
-
 	Clean up the code in general.
 	Add better documentation/comments where needed.
 	Identify possible security weaknesses.
 	Identify possible optimization opportunities.
-	  Implement a means to use the showErr($e) function to handle the try/catch 
-	  blocks as well as a mysql_error() message.  The goal is to never have a break
-	  in the code's execution, and the or die() clause is doing just that.
-
 */
-class dbconn {
+class database {
 	private $host;
 	private $username;
 	private $password;
 	private $database;
 	private $connection;
+	private $debug;
 	
-	function dbconn() {
-		$this->host="test";
+	//setup the connection details
+	function setup($host,$user,$pass,$db) {
+		$this->setHost($host);
+		$this->setUsername($user);
+		$this->setPassword($pass);
+		$this->setDatabase($db);
+		$this->setDebug(false);
 	}
+	
 	//Open a connection
 	function open() {
 		//Start a connection to the database
@@ -85,16 +87,16 @@ class dbconn {
 			$tmp=explode(" ", $sql);
 			$com=strtoupper($tmp[0]);
 			if($com=="INSERT" || $com == "DELETE" || $com == "UPDATE") {
-				if(!$result=mysql_query($sql,$this->getConnection())) {
+				if(!$result=@mysql_query($sql,$this->getConnection()) or $this->showErr("***Error*** ".mysql_error())) {
 					throw new Exception("Error #1");
 				}
 				return true;
 			} else {
-				if(!$result=mysql_query($sql,$this->getConnection())) {
+				if(!$result=@mysql_query($sql,$this->getConnection()) or $this->showErr("***Error*** ".mysql_error())) {
 					throw new Exception("SQL SELECT statement error", 001);
 				}
 				$x=0;
-				while($row=mysql_fetch_array($result)) {
+				while($row=@mysql_fetch_array($result) or $this->showErr("***Error*** ".mysql_error())) {
 					$arr[$x]=$row;
 					$x++;
 				}
@@ -113,22 +115,65 @@ class dbconn {
 		//close the connection
 		$this->close($this->getConnection());
 	}
-	//Get functions for fields
-	function getHost() {
-		return $this->host;
+	
+	/* showErr($e) takes unhandled error information and displays
+	it to you on the screen, nicely formatted with CSS.  Very descriptive
+	withe line numbers, file names, and a stack trace.*/
+	function showErr($e) {
+		//Only bother with this if debug is on
+		if($this->getDebug()) {
+			//Check if the *** delimter is set, indicating that I am passing a mysql_error code
+			?>
+			<style type="text/css">
+				#exception {
+					z-index:101;
+					margin-left:auto;
+					margin-right:auto;
+					margin-bottom:10px;
+					margin-top:10px;
+					width:640px;
+					border:2px solid #000;
+					background-color:#930;	
+					padding:10px;
+					color:#FFF;
+				}
+				#exception h2 {
+					padding:0px;
+					margin:0px;
+				}
+			</style>
+			<div id="exception">
+				<h2>An Error has occured</h2>
+				<small>database.class.php error handler</small>
+				<hr />
+				<p>Debugging</p>
+				<?php
+				if(substr($e,0,3)=="***") {
+					$html_out = "MySQL has encountered an error. Here it is:<br />".$e;
+				}
+				else {
+					$html_out = "<ul>";
+					$html_out = $html_out."<li>Error Message: ".$e->getMessage()."</li>";
+					$html_out = $html_out."<li>Error Code: ".$e->getCode()."</li>";
+					$html_out = $html_out."<li>Error File: ".$e->getFile()."</li>";
+					$html_out = $html_out."<li>Error Line:".$e->getLine()."</li>";
+					$html_out = $html_out."<li>Error Stack Trace: <br />";
+					$html_out = $html_out."<ul>";
+					foreach($e->getTrace() AS $line) {
+							print_r($line);
+							$html_out = $html_out."<li>File: ".$line['file']."<br />Function: ".$line['function']."<br />Argument: ".$line['args'][0]."</li>";
+					}
+					$html_out = $html_out."</ul>";
+					$html_out = $html_out."</li>";
+					$html_out = $html_out."</ul>";
+				}
+				echo $html_out;
+					?>
+			</div>
+			<?php
+		}
 	}
-	function getUsername() {
-		return $this->username;
-	}
-	function getPassword() {
-		return $this->password;
-	}
-	function getDatabase() {
-		return $this->database;
-	}
-	function getConnection() {
-		return $this->connection;
-	}
+	
 	//Set functions for fields
 	function setHost($val) {
 		$this->host=$val;
@@ -145,38 +190,28 @@ class dbconn {
 	function setConnection($val) {
 		$this->connection=$val;
 	}
-	function showErr($e) {
-		//Check if the *** delimter is set, indicating that I am passing a mysql_error code
-		?>
-		<div id="exception">
-			<h2>An Error has occured</h2>
-			<hr />
-			<p>Debugging</p>
-			<?php
-			if(substr($e,0,3)=="***") {
-				$html_out = "MySQL has encountered an error. Here it is: ".$e;
-			}
-			else {
-				$html_out = "<ul>";
-				$html_out = $html_out."<li>Error Message: ".$e->getMessage()."</li>";
-				$html_out = $html_out."<li>Error Code: ".$e->getCode()."</li>";
-				$html_out = $html_out."<li>Error File: ".$e->getFile()."</li>";
-				$html_out = $html_out."<li>Error Line:".$e->getLine()."</li>";
-				$html_out = $html_out."<li>Error Stack Trace: <br />";
-				$html_out = $html_out."<ul>";
-					foreach($e->getTrace() AS $line) {
-							print_r($line);
-							//$html_out = $html_out."<li>File: ".$line['file']."<br />Function: ".$line['function']."<br />Argument: ".$line['args'][0]."</li>";
-					}
-					//echo print_r($e->getTrace()); 
-					$html_out = $html_out."</ul>";
-					$html_out = $html_out."</li>";
-					$html_out = $html_out."</ul>";
-			}
-			echo $html_out;
-				?>
-		</div>
-		<?php
+	function setDebug($val) {
+		$this->debug=$val;
+	}
+	
+	//Get functions for fields
+	function getHost() {
+		return $this->host;
+	}
+	function getUsername() {
+		return $this->username;
+	}
+	function getPassword() {
+		return $this->password;
+	}
+	function getDatabase() {
+		return $this->database;
+	}
+	function getConnection() {
+		return $this->connection;
+	}
+	function getDebug() {
+		return $this->debug;
 	}
 }
 ?>

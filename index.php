@@ -11,10 +11,11 @@
 <?php
 //Testing implementations
 require_once("phpLattice.php");
-$tphp = new PHPLattice();
-//Testing the database class
-$database = $tphp->loadResource($tphp->classes['database.class.php']);
-$database->open();
+$phpl = new PHPLattice();
+//Testing the email class
+$email = $phpl->loadResource("email");
+print_r($email);
+
 ?>
 </body>
 </html>

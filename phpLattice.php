@@ -42,21 +42,40 @@ class PHPLattice {
 				echo "Either the directory for PHPLattice Framework is missing, or there are incorrect permissions set for file reading/writing.";	
 			}
 		}
+		//Load our 'available' function library names into the function_libs variable
+		if($handle = opendir(getcwd()."/lib/functions")) { 
+			while (false !== ($entry = readdir($handle))) {
+				//exclude current and parent directory symbols
+				if($entry!="." && $entry!="..") {
+					$this->function_libs[$entry]=getcwd()."/lib/functions/".$entry;
+				}
+			}
+		} 
+		//No classes were found, give some error information
+		else {
+			if($debug) {
+				echo "Either the directory for PHPLattice Framework is missing, or there are incorrect permissions set for file reading/writing.";	
+			}
+		}
 			
 	}
 	
 	/* Loads a specified resource into the frameworks active set
 	of classes or functions.  This is the name of the file (without the .php)*/
 	function loadResource($name) {
-		//Hard coding the resources for security purposes - ALWAYS UPDATE THIS
-		$tmp_name=explode("/", $name);
-		$name=$tmp_name[(sizeof($tmp_name)-1)];
-		unset($tmp_name);
 		$tmp = false;
 		switch ($name) {
-			case "database.class.php":
-				include($this->classes[$name]);
-				$tmp = new dbconn();
+			case "database":
+				include($this->classes[$name.".class.php"]);
+				$tmp = new database();
+				break;
+			case "email":
+				include($this->classes[$name.".class.php"]);
+				$tmp = new email();
+				break;
+			case "basic_functions":
+				include($this->function_libs[$name.".php"]);
+				$tmp = true;
 				break;
 		}
 		return $tmp;
