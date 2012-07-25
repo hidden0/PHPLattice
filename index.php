@@ -13,8 +13,8 @@
 require_once("phpLattice.php");
 $phpl = new PHPLattice();
 //Testing the email class
-$email = $phpl->loadResource("email");
-print_r($email);
+$phpl->loadResource("email");
+print_r($phpl->resource['email']);
 
 ?>
 </body>

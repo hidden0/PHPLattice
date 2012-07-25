@@ -19,7 +19,7 @@ class PHPLattice {
 	var $classes; //array to store list of available classes in framework
 	var $function_libs; //array that lists the available function libraries
 	var $debug; //debugging variable - set to true to see error output
-	
+	var $resource; //container for loaded resources
 	//Methods
 	
 	/* The constructor learns about its own environment.
@@ -67,11 +67,11 @@ class PHPLattice {
 		switch ($name) {
 			case "database":
 				include($this->classes[$name.".class.php"]);
-				$tmp = new database();
+				$this->resource[$name] = new database();
 				break;
 			case "email":
 				include($this->classes[$name.".class.php"]);
-				$tmp = new email();
+				$this->resource[$name] = new email();
 				break;
 			case "basic_functions":
 				include($this->function_libs[$name.".php"]);
