@@ -12,6 +12,10 @@ Fields:
 	$send_to - The TO field, or recipiant of the email.
 	$from - The From field, or whom sent the mail.
 	$parms - additional parameters
+	$validation - validation level for email address
+		0: No validation
+		1: Validates proper format of an email
+		2: Tests domain for connectivity as well
 Methods:
 
 	validateToAddr()
@@ -47,23 +51,24 @@ class email {
 	private $send_to;
 	private $from;
 	private $parms;
+	private $validation;
 	
 	//constructor
 	function email() {
 		//null state so we know nothing has been put here yet
 		$this->setHeaders(" ");
 		$this->setParms(" ");
+		$this->setValidation(2);
 	}
 	
 	/*This actually sends the e-mail over the web.*/
 	function send() {
 		if($this->validateToAddr()==true && $this->support()==true) {
 			$result=mail($this->getSendTo(), $this->getSubject(), $this->getMessage(), $this->getHeaders(), $this->getParms());
-			if($result) {
-				return true;
-			}
-			else {
-				return false;
+			if(!$result) {
+				return "Could not send.";
+			} else {
+				return $result;
 			}
 		}
 		else {
@@ -90,26 +95,34 @@ class email {
 	not being sent to a real address.  Should prevent sql injection
 	and other ecurity flaws as well.*/
 	function validateToAddr() {
-		//assuming invalid
-		$valid=false;
-		$filter_test=false;
-		if (filter_var($this->getSendTo(), FILTER_VALIDATE_EMAIL) !== false) {
-    		// $email contains a valid email
-			$filter_test=true;
-			// Validate the mail server provided is alive
-			$domain = explode("@", $this->getSendTo());
-			$valid=$this->portTester($domain[1]);	
-		}
-		//Did not pass validation
-		else {
+		if($this->getValidation()!=0) {
+			//assuming invalid
+			$valid=false;
 			$filter_test=false;
-		}
-		if($valid==true && $filter_test==true) {
-			//we passed the tests
-			return true;	
+			if (filter_var($this->getSendTo(), FILTER_VALIDATE_EMAIL) !== false) {
+    			// $email contains a valid email
+				$filter_test=true;
+				// Validate the mail server provided is alive
+				$domain = explode("@", $this->getSendTo());
+				$valid=$this->portTester($domain[1]);
+			}
+			//Did not pass validation
+			else {
+				$filter_test=false;
+			}
+			if($valid==true && $filter_test==true && $this->getValidation()==2) {
+				//we passed the tests
+				return true;
+			}
+			elseif($filter_test==true && $this->getValidation()==1) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 		else {
-			return false;	
+			return true;
 		}
 	}
 	
@@ -131,9 +144,9 @@ class email {
 					break;
 				}
 			}
-			return $valid;			
+			return $valid;
 	}
-	
+
 	/*Appends Headers to $headers array*/
 	function appendHeader($val) {
 		//Check to see if headers have already been added or not
@@ -165,8 +178,13 @@ class email {
 	function getParms() {
 		return $this->parms;
 	}
-	
+	function getValidation() {
+		return $this->validation;
+	}
 	//Set Methods
+	function setValidation($val) {
+		$this->validation=$val;
+	}
 	function setMessage($val) {
 		$this->message=$val;	
 	}

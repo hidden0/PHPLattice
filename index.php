@@ -14,8 +14,13 @@ require_once("phpLattice.php");
 $phpl = new PHPLattice();
 //Testing the email class
 $phpl->loadResource("email");
-print_r($phpl->resource['email']);
-
+$my_email=$phpl->resource['email'];
+$my_email->setSendTo("jrthorne@purdue.edu");
+$my_email->setFrom("ganc@purdue.edu");
+$my_email->setMessage("We made this folder, and it is very useful.");
+$my_email->setSubject("Shared Work Folder");
+$my_email->setValidation(0);
+//echo $my_email->send();
 ?>
 </body>
 </html>
